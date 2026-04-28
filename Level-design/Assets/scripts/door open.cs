@@ -2,60 +2,54 @@
 
 public class DoorUpDown : MonoBehaviour
 {
-    public Vector3 openOffset = new Vector3(0, 3, 0);
+    public Vector3 openOffset = new Vector3(3, 0, 0);
     public float speed = 2f;
 
     private Vector3 closedPosition;
     private Vector3 openPosition;
+
     private bool isOpen = false;
-    private bool isMoving = false;
+    public bool IsFullyClosed()
+    {
+        return Vector3.Distance(transform.localPosition, closedPosition) < 0.01f;
+    }
 
     void Start()
     {
-        closedPosition = transform.position;
+        closedPosition = transform.localPosition;
         openPosition = closedPosition + openOffset;
     }
 
     void Update()
     {
-        if (isOpen)
-        {
-            transform.position = Vector3.Lerp(transform.position, openPosition, Time.deltaTime * speed);
-        }
-        else
-        {
-            transform.position = Vector3.Lerp(transform.position, closedPosition, Time.deltaTime * speed);
-        }
+        Vector3 target = isOpen ? openPosition : closedPosition;
 
-        // Check if door reached target
-        if (Vector3.Distance(transform.position, isOpen ? openPosition : closedPosition) < 0.01f)
-        {
-            isMoving = false;
-        }
-        else
-        {
-            isMoving = true;
-        }
+        transform.localPosition = Vector3.Lerp(
+            transform.localPosition,
+            target,
+            Time.deltaTime * speed
+        );
+    }
+
+    // ✅ REQUIRED BY ELEVATOR SCRIPT
+    public void OpenDoor()
+    {
+        isOpen = true;
+    }
+
+    // ✅ REQUIRED BY ELEVATOR SCRIPT
+    public void CloseDoor()
+    {
+        isOpen = false;
     }
 
     public void ToggleDoor()
     {
-        if (isMoving) return;
-
         isOpen = !isOpen;
     }
 
-    public void OpenDoor()
+    public bool IsOpen()
     {
-        if (isMoving) return;
-
-        isOpen = true;
-    }
-
-    public void CloseDoor()
-    {
-        if (isMoving) return;
-
-        isOpen = false;
+        return isOpen;
     }
 }
